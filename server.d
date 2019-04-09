@@ -1,5 +1,8 @@
+import std.socket;
+import std.stdio;
+
 void main() {
-   import std.socket;
+   
    auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
    listener.bind(new InternetAddress("localhost", 2525));
    listener.listen(10);
@@ -16,13 +19,14 @@ void main() {
             if(readSet.isSet(client)) {
                 // read from it and echo it back
                 auto got = client.receive(buffer);
+                writeln(buffer[0 .. got]);
                 client.send(buffer[0 .. got]);
             }
           if(readSet.isSet(listener)) {
              // the listener is ready to read, that means
              // a new client wants to connect. We accept it here.
              auto newSocket = listener.accept();
-             newSocket.send("Hello!\n"); // say hello
+             newSocket.send("Bem-vindo ao servidor!\n"); // say hello
              connectedClients ~= newSocket; // add to our list
           }
        }
