@@ -1,21 +1,6 @@
 import std.socket;
 import std.stdio;
 
-class Jogador{
-    int id;
-    enum tipo_jogador{
-        mestre, player}
-    string nome;
-    int pontuacao;
-}
-
-class Partida{
-    int id;
-    Jogador[] jogadores;
-    string resposta;
-    string dica;
-}
-
 void main() {
    
    auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);

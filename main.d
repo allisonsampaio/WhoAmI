@@ -1,4 +1,3 @@
-module cliente;
 import std.stdio;
 
 void main()
@@ -8,17 +7,21 @@ void main()
     writeln("------------------------------------------");
 }
 
-class Partida{
-	int id;
-	Jogador mestre;
-	string dica;
-	string resposta;
-	int tempo;
-	int pontuacao_maxima;
+class Jogador{
+    int id;
+    enum tipo_jogador{
+        mestre, player}
+    string nome;
+    int pontuacao;
 }
 
-class Jogador{
-	int id;
-	string nome;
-	int pontuacao;
+class Partida{
+    int id;
+    Jogador[] jogadores;
+    string resposta;
+    string dica;
+}
+
+class Rodada{
+	
 }
