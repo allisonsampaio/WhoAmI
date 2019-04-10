@@ -1,6 +1,21 @@
 import std.socket;
 import std.stdio;
 
+class Jogador{
+    int id;
+    enum tipo_jogador{
+        mestre, player}
+    string nome;
+    int pontuacao;
+}
+
+class Partida{
+    int id;
+    Jogador[] jogadores;
+    string resposta;
+    string dica;
+}
+
 void main() {
    
    auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
@@ -17,17 +32,14 @@ void main() {
        if(Socket.select(readSet, null, null)) {
           foreach(client; connectedClients)
             if(readSet.isSet(client)) {
-                // read from it and echo it back
                 auto got = client.receive(buffer);
                 writeln(buffer[0 .. got]);
                 client.send(buffer[0 .. got]);
             }
           if(readSet.isSet(listener)) {
-             // the listener is ready to read, that means
-             // a new client wants to connect. We accept it here.
              auto newSocket = listener.accept();
-             newSocket.send("Bem-vindo ao servidor!\n"); // say hello
-             connectedClients ~= newSocket; // add to our list
+             newSocket.send("Bem-vindo ao servidor!\n");
+             connectedClients ~= newSocket;
           }
        }
    }
