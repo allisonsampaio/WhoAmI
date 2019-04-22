@@ -10,6 +10,9 @@ void main() {
     writeln(buffer[0 .. received]);
     foreach(line; stdin.byLine) {
        socket.send(line);
-       writeln("Server said: ", buffer[0 .. socket.receive(buffer)]);
+       if(line == "exit"){
+           socket.close();
+       }
+       //writeln("Server said: ", buffer[0 .. socket.receive(buffer)]);
     }
 }
