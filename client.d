@@ -12,6 +12,7 @@ void main() {
        socket.send(line);
        if(line == "exit"){
            socket.close();
+           break;
        }
        //writeln("Server said: ", buffer[0 .. socket.receive(buffer)]);
     }
