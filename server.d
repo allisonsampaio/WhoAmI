@@ -18,13 +18,16 @@ void main() {
        foreach(client; connectedClients) readSet.add(client); //Adiciona todos os sockets conectados na lista do readSet
        if(Socket.select(readSet, null, null)) {
           foreach(client; connectedClients)
-            if(readSet.isSet(client)) {
+            if(readSet.isSet(client))  {
                 auto got = client.receive(buffer);
                 if(buffer[0 .. got] == "exit"){
                    connectedClients = remove(connectedClients, i);
+                   writeln(connectedClients.length);
                 }
+                else{
                 writeln(buffer[0 .. got]);
                 client.send(buffer[0 .. got]);
+                }
                 }
                i += 1; 
             }
@@ -40,8 +43,20 @@ void main() {
 
 Socket[] remove(Socket[] connectedClients, int indice){
    int i;
-   for(i = indice; i<(connectedClients.length-1);i++){
-      connectedClients[i] = connectedClients[i+1];
+   Socket[] novalista;
+   connectedClients[indice] = null;
+   if(connectedClients.length == 1){    
+      return novalista;
    }
-   return connectedClients;
+   for(i=0; i<(connectedClients.length);i++){
+      if(connectedClients[i] !is null){   
+      novalista ~= connectedClients[i];
+      }
+   }
+   for(i=0; i<(novalista.length);i++){
+         
+      writeln(novalista[i]);
+      
+   }
+   return novalista;
 }
