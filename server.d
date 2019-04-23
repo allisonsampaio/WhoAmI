@@ -11,18 +11,18 @@ void main() {
    Socket[] connectedClients; //array de clientes conectados
    char[1024] buffer; //buffer usado para recebimentos de mensagens
    bool isRunning = true; //1 é true
+   writeln("BOm dia");
    while(isRunning) {
        i = 0;
        readSet.reset(); //tira todos os sockets da variavel
        readSet.add(listener); //adiciona o socket que aceita conexões na lista de Sockets
        foreach(client; connectedClients) readSet.add(client); //Adiciona todos os sockets conectados na lista do readSet
        if(Socket.select(readSet, null, null)) {
-          foreach(client; connectedClients)
+          foreach(client; connectedClients){
             if(readSet.isSet(client))  {
                 auto got = client.receive(buffer);
                 if(buffer[0 .. got] == "exit"){
                    connectedClients = remove(connectedClients, i);
-                   writeln(connectedClients.length);
                 }
                 else{
                 writeln(buffer[0 .. got]);
@@ -31,7 +31,7 @@ void main() {
                 }
                i += 1; 
             }
-      
+       }      
           if(readSet.isSet(listener)) {
              auto newSocket = listener.accept();
              newSocket.send("Bem-vindo ao servidor!\n");
@@ -52,11 +52,6 @@ Socket[] remove(Socket[] connectedClients, int indice){
       if(connectedClients[i] !is null){   
       novalista ~= connectedClients[i];
       }
-   }
-   for(i=0; i<(novalista.length);i++){
-         
-      writeln(novalista[i]);
-      
    }
    return novalista;
 }
