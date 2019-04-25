@@ -10,9 +10,7 @@ void main() {
    auto readSet = new SocketSet();
    Socket[] connectedClients; //array de clientes conectados
    char[1024] buffer; //buffer usado para recebimentos de mensagens
-   bool isRunning = true; //1 é true
-   writeln("BOm dia");
-   while(isRunning) {
+   while(true) {
        i = 0;
        readSet.reset(); //tira todos os sockets da variavel
        readSet.add(listener); //adiciona o socket que aceita conexões na lista de Sockets
@@ -23,10 +21,14 @@ void main() {
                 auto got = client.receive(buffer);
                 if(buffer[0 .. got] == "exit"){
                    connectedClients = remove(connectedClients, i);
+                   break;
                 }
                 else{
+                foreach(sender; connectedClients){
+                   writeln("Enviou");
+                   sender.send(buffer[0 .. got]);
+                }
                 writeln(buffer[0 .. got]);
-                client.send(buffer[0 .. got]);
                 }
                 }
                i += 1; 
