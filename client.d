@@ -23,3 +23,24 @@ void main() {
     
     }
 }
+
+int receber(){
+    while(true){
+        if(1 ou 0){
+            break;
+        }
+        writeln("Server said: ", buffer[0 .. socket.receive(buffer)]);
+
+    }
+    return 1 ou 0
+}
+
+void enviar(){
+    writeln("Digite sua pergunta");
+    //Cliente digita a ṕergunta
+    //cliente espera e recebe a resposta
+    writeln("Digite seu chute");
+    //cliente digita o chute
+    //cliente aguarda a resposta
+    return;
+}
