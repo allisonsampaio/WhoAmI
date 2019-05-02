@@ -1,6 +1,19 @@
 import std.socket;
 import std.stdio;
 
+class Partida{
+    Jogador[] jogadores;
+    string resposta;
+    string dica;
+
+void setDica(string dica){
+    this.dica = dica;
+}
+void setResposta(string resposta){
+    this.resposta = resposta;
+}
+}
+
 void main() {
    
    auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
@@ -10,6 +23,38 @@ void main() {
    auto readSet = new SocketSet();
    Socket[] connectedClients; //array de clientes conectados
    char[1024] buffer; //buffer usado para recebimentos de mensagens
+   while(true){
+      if(readSet.isSet(listener)) {
+             auto newSocket = listener.accept();
+             newSocket.send("Bem-vindo ao servidor!\n");
+             connectedClients ~= newSocket;
+             if(connectedClients.length == 1){
+                newSocket.send(1);
+                readSet.add(connectedClients[0]);
+             }
+             else{
+                newSocket.send(connectedClients.length);
+             }
+          }
+          if(readSet.isSet(connectedClients[0])){
+             auto got = connectedClients[0].receive(buffer);
+             if(buffer[0 .. got] == "start"){
+                break;
+             }
+          }
+   }
+Partida partida = new Partida();
+while(true){
+   if(readSet.isSet(connectedClients[0])){
+             auto got = connectedClients[0].receive(buffer);
+             partida.setDica(buffer[0 .. got]);
+             auto got = connectedClients[0].receive(buffer);
+             partida.setResposta(buffer[0 .. got]);
+             break;
+          }
+}
+
+
    while(true) {
        i = 0;
        readSet.reset(); //tira todos os sockets da variavel
@@ -34,11 +79,7 @@ void main() {
                i += 1; 
             }
        }      
-          if(readSet.isSet(listener)) {
-             auto newSocket = listener.accept();
-             newSocket.send("Bem-vindo ao servidor!\n");
-             connectedClients ~= newSocket;
-          }
+          
        }
    }
 
