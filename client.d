@@ -52,25 +52,26 @@ void mestre(Jogador jogador, Socket socket){
     socket.send(resposta);
 }
 
-int receber(){
+int receber(Jogador jogador, Socket socket){
     while(true){
         if(1 ou 0){
             break;
         }
-        writeln("Server said: ", buffer[0 .. socket.receive(buffer)]);
+        
     }
     return 1 ou 0
 }
 
-void enviar(){
+void enviar(Jogador jogador, Socket socket){
     char[500] pergunta;
     char[500] resposta;
     writeln("Digite sua pergunta");
     scanf("%s", &pergunta);
     socket.send(pergunta);
-    //cliente espera e recebe a resposta
+    auto received = socket.receive(buffer); 
+    writeln(buffer[0 .. received]);
     writeln("Digite seu chute");
     scanf("%s", &resposta);
-    //cliente aguarda a resposta
+    socket.send(resposta);
     return;
 }
