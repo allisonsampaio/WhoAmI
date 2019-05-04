@@ -1,15 +1,27 @@
 import std.socket;
 import std.stdio;
 
+class Jogador{
+    int id;
+    enum tipo_jogador{
+        mestre, player}
+    string nome;
+    int pontuacao;
+
+void setId(int id){
+    this.id = id;
+}
+}
+
 class Partida{
     Jogador[] jogadores;
-    string resposta;
-    string dica;
+    char[] resposta;
+    char[] dica;
 
-void setDica(string dica){
+void setDica(char[] dica){
     this.dica = dica;
 }
-void setResposta(string resposta){
+void setResposta(char[] resposta){
     this.resposta = resposta;
 }
 }
@@ -29,11 +41,11 @@ void main() {
              newSocket.send("Bem-vindo ao servidor!\n");
              connectedClients ~= newSocket;
              if(connectedClients.length == 1){
-                newSocket.send(1);
-                readSet.add(connectedClients[0]);
+                newSocket.send("1");
              }
              else{
-                newSocket.send(connectedClients.length);
+                newSocket.send("0");
+
              }
           }
           if(readSet.isSet(connectedClients[0])){
@@ -43,12 +55,13 @@ void main() {
              }
           }
    }
+foreach(client; connectedClients) readSet.add(client);
 Partida partida = new Partida();
 while(true){
    if(readSet.isSet(connectedClients[0])){
              auto got = connectedClients[0].receive(buffer);
              partida.setDica(buffer[0 .. got]);
-             auto got = connectedClients[0].receive(buffer);
+             got = connectedClients[0].receive(buffer);
              partida.setResposta(buffer[0 .. got]);
              break;
           }
@@ -59,7 +72,7 @@ while(true){
        i = 0;
        readSet.reset(); //tira todos os sockets da variavel
        readSet.add(listener); //adiciona o socket que aceita conexões na lista de Sockets
-       foreach(client; connectedClients) readSet.add(client); //Adiciona todos os sockets conectados na lista do readSet
+        //Adiciona todos os sockets conectados na lista do readSet
        if(Socket.select(readSet, null, null)) {
           foreach(client; connectedClients){
             if(readSet.isSet(client))  {

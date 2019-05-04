@@ -20,14 +20,15 @@ void main() {
     socket.connect(new InternetAddress("localhost", 2525));
     auto received = socket.receive(buffer); // wait for the server to say hello
     writeln(buffer[0 .. received]);
-    auto received = socket.receive(buffer);
+    received = socket.receive(buffer);
     Jogador jogador = new Jogador();
-    jogador.setId(int(buffer[0 .. received]));
+    int id_jogador = cast(int)buffer[0 .. received];
+    jogador.setId(id_jogador);
     if(jogador.id == 1){
-        mestre(socket, jogador);
+        mestre(jogador, socket);
     }
     else{
-        jogador();
+        wait();
     }
     while(true){
     writeln("Server said: ", buffer[0 .. socket.receive(buffer)]);
@@ -40,7 +41,9 @@ void main() {
     }    
     }
 }
-
+void wait(){
+    writeln("Esperando partida começar");
+}
 void mestre(Jogador jogador, Socket socket){
     char[50] dica;
     char[50] resposta;
@@ -54,15 +57,16 @@ void mestre(Jogador jogador, Socket socket){
 
 int receber(Jogador jogador, Socket socket){
     while(true){
-        if(1 ou 0){
+        if(1){
             break;
         }
         
     }
-    return 1 ou 0
+    return 1;
 }
 
 void enviar(Jogador jogador, Socket socket){
+    char[1024] buffer;
     char[500] pergunta;
     char[500] resposta;
     writeln("Digite sua pergunta");
