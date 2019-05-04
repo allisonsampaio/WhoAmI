@@ -21,16 +21,20 @@ void main() {
     auto received = socket.receive(buffer); // wait for the server to say hello
     writeln(buffer[0 .. received]);
     received = socket.receive(buffer);
+    writeln(received);
     Jogador jogador = new Jogador();
-    int id_jogador = cast(int)buffer[0 .. received];
+    int id_jogador = cast(int)buffer[0] - '0';
+    writeln(id_jogador);
     jogador.setId(id_jogador);
     if(jogador.id == 1){
+        wait_jogador(socket);
         mestre(jogador, socket);
     }
     else{
-        wait();
+        wait_jogador(socket);
+        wait(socket);
     }
-    while(true){
+    /*while(true){
     writeln("Server said: ", buffer[0 .. socket.receive(buffer)]);
     foreach(line; stdin.byLine) {
        socket.send(line);
@@ -39,11 +43,48 @@ void main() {
            break;
        }
     }    
+    }*/
+    writeln("asdyagwofuiwehaúfgyeuigtWU");
+    return;
+}
+
+// Esperando o mestre inserir a dica e resposta
+void wait(Socket socket){
+    writeln("Mestre digitando");
+    char[1024] buffer;
+    while(true){
+        auto received = socket.receive(buffer);
+        if(buffer[0 .. received] == "init"){
+            received = socket.receive(buffer);
+            writeln(buffer[0 .. received]);
+            return;
+        }
     }
 }
-void wait(){
+
+void wait_jogador(Socket socket){
     writeln("Esperando partida começar");
+    char[1024] buffer;
+    while(true){
+        auto received = socket.receive(buffer);
+        if(buffer[0 .. received] == "start"){
+            return;
+        }
+    }
 }
+/*
+void wait_mestre(Jogador mestre, Socket socket){
+    writeln("Quando quiser comecar a partida digite start");
+    while(true){
+        foreach(line; stdin.byLine){    
+        if(line == "start"){
+            socket.send(line);
+            return;
+        }
+        
+        }
+    }
+}*/
 void mestre(Jogador jogador, Socket socket){
     char[50] dica;
     char[50] resposta;
