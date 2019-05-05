@@ -1,7 +1,10 @@
 import std.socket;
 import std.stdio;
+import std.file;
+import std.string;
 
 class Jogador{
+   public:
    int id;
    string nome;
    int pontuacao;
@@ -16,7 +19,8 @@ class Jogador{
 }
 
 class Partida{
-   Jogador[] jogadores;
+   public:
+   string[] nomes; 
    char[] resposta;
    char[] dica;
 
@@ -32,26 +36,31 @@ class Partida{
    char[] getDica(){
       return this.dica;
    }
+
+   void setNome(string nome){
+      this.nomes ~= nome;
+   }
 }
 
 void main() {
    int i = 0;
+   string name;
+   Partida partida = new Partida();
    auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
    listener.bind(new InternetAddress("localhost", 2525)); //conecta o listener a uma porta e IP
    listener.listen(10);
    auto readSet = new SocketSet();
    Socket[] connectedClients; //array de clientes conectados
+   File file = File("nomes.txt", "a");
+   char[50] nome;
    char[50] buffer; //buffer usado para recebimentos de mensagens
    readSet.add(listener);  
    while(true){
       if(Socket.select(readSet, null, null)){
       if(readSet.isSet(listener)) {
              auto newSocket = listener.accept();
-
-             auto res = newSocket.receive(buffer);
-             Jogador jogador = new Jogador();
-             jogador.setNome(cast(string)(buffer[0 .. res]));
-
+             auto res = newSocket.receive(nome);
+             file.write(cast(string)(nome[0 .. res]));
              newSocket.send("Bem-vindo ao servidor!\n");
              res = newSocket.receive(buffer);
              connectedClients ~= newSocket;
@@ -67,28 +76,22 @@ void main() {
              }
           }
          if(connectedClients.length == 3){
+               file = File("nomes.txt", "r");
+               while(!file.eof()){
+                  string line = chomp(file.readln());
+                  if(line != ""){
+                     partida.nomes ~= line;
+                  }
+               }
+               file = File("nomes.txt", "w");
+               file.write("");
+               file.close();
                sendStart(connectedClients);
             break;
          }
-   /*
-          if(readSet.isSet(connectedClients[0])){
-              writeln("Entrou 1");
-             auto got = connectedClients[0].receive(buffer);
-             writeln("Entrou 2");
-             if(buffer[0 .. got] == "start"){
-                writeln("Entrou");
-                break;
-             }
-             else {
-                  writeln("Entrou 3");
-             }
-          
-          }
-     */  
    }
    }
-
-   Partida partida = new Partida();
+   
    char[50] resposta;
    char[50] dica;
    writeln("Recebendo info");
@@ -136,13 +139,17 @@ void main() {
       client.send("acabou");
    }
 }
-
+string criaNome(string nome){
+   string name;
+   name = nome;
+   return name;
+}
 void sendStart(Socket[] clients){
    foreach(client; clients){
                client.send("start");
             }
    return;
-}
+}/*
 Socket[] remove(Socket[] connectedClients, int indice){
    int i;
    Socket[] novalista;
@@ -156,4 +163,4 @@ Socket[] remove(Socket[] connectedClients, int indice){
       }
    }
    return novalista;
-}
+}*/

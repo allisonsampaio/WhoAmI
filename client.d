@@ -13,6 +13,9 @@ class Jogador{
     void setNome(string nome){
         this.nome = nome;
     }
+    string getNome(){
+        return this.nome;
+    }
 }
 
 void main() {
@@ -25,17 +28,15 @@ void main() {
     auto socket = new Socket(AddressFamily.INET,  SocketType.STREAM);
     socket.connect(new InternetAddress("localhost", 2525));
 
-    socket.send(nomeJogador);
+    socket.send(jogador.getNome());
 
     char[50] buffer;
     auto received = socket.receive(buffer); // wait for the server to say hello
     writeln(buffer[0 .. received]);
     socket.send("ok");
     received = socket.receive(buffer);
-    writeln(received);
     socket.send("ok");
     int id_jogador = cast(int)buffer[0] - '0';
-    writeln(id_jogador);
     jogador.setId(id_jogador);
     if(jogador.id == 1){
         wait_jogador(socket);
@@ -77,19 +78,7 @@ void wait_jogador(Socket socket){
         }
     }
 }
-/*
-void wait_mestre(Jogador mestre, Socket socket){
-    writeln("Quando quiser comecar a partida digite start");
-    while(true){
-        foreach(line; stdin.byLine){    
-        if(line == "start"){
-            socket.send(line);
-            return;
-        }
-        
-        }
-    }
-}*/
+
 void mestre(Jogador jogador, Socket socket){
     char[] dica;
     char[] resposta;
