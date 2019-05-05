@@ -3,26 +3,37 @@ import std.socket;
 
 class Jogador{
     int id;
-    enum tipo_jogador{
-        mestre, player}
     string nome;
     int pontuacao;
 
-void setId(int id){
-    this.id = id;
-}
+    void setId(int id){
+        this.id = id;
+    }
+
+    void setNome(string nome){
+        this.nome = nome;
+    }
 }
 
 void main() {
+    Jogador jogador = new Jogador();
+    char[] nomeJogador;
+    writeln("Digite seu user");
+    readln(nomeJogador);
+    jogador.setNome(cast(string)nomeJogador);
 
     auto socket = new Socket(AddressFamily.INET,  SocketType.STREAM);
-    char[1024] buffer;
     socket.connect(new InternetAddress("localhost", 2525));
+
+    socket.send(nomeJogador);
+
+    char[50] buffer;
     auto received = socket.receive(buffer); // wait for the server to say hello
     writeln(buffer[0 .. received]);
+    socket.send("ok");
     received = socket.receive(buffer);
     writeln(received);
-    Jogador jogador = new Jogador();
+    socket.send("ok");
     int id_jogador = cast(int)buffer[0] - '0';
     writeln(id_jogador);
     jogador.setId(id_jogador);
@@ -32,38 +43,33 @@ void main() {
         jogo_mestre(jogador, socket);
     }
     else{
+        int isDone = 0;
         wait_jogador(socket);
-        wait(socket);
-        jogo_enviar(jogador, socket);
-    }
-    /*while(true){
-    writeln("Server said: ", buffer[0 .. socket.receive(buffer)]);
-    foreach(line; stdin.byLine) {
-       socket.send(line);
-       if(line == "exit"){
-           socket.close();
-           break;
-       }
-    }    
-    }*/
-    return;
-}
-
-// Esperando o mestre inserir a dica e resposta
-void wait(Socket socket){
-    writeln("Mestre digitando");
-    char[1024] buffer;
-        auto received = socket.receive(buffer);
-        if(buffer[0 .. received] == "init"){
-            writeln("Recebeu a buceta do init");
-            return;
+        writeln("Mestre digitando");
+        while(true){
+            auto rec = socket.receive(buffer);
+            writeln(buffer[0 .. rec]);
+            if(buffer[0 .. rec] == "suavez"){
+                isDone = jogo_enviar(jogador, socket);
+                if(isDone == 1){
+                writeln("Voce ganhou");
+                break;
+            }
+            }
+            
+            if(buffer[0 .. rec] == "acabou"){
+                writeln("O jogo acabou !!");
+                break;
+            }
         }
-    
+        
+    }
+    return;
 }
 
 void wait_jogador(Socket socket){
     writeln("Esperando partida começar");
-    char[1024] buffer;
+    char[50] buffer;
     while(true){
         auto received = socket.receive(buffer);
         if(buffer[0 .. received] == "start"){
@@ -85,46 +91,53 @@ void wait_mestre(Jogador mestre, Socket socket){
     }
 }*/
 void mestre(Jogador jogador, Socket socket){
-    char[50] dica;
-    char[50] resposta;
+    char[] dica;
+    char[] resposta;
     writeln("Informe a dica");
-    scanf("%s", &dica);
+    readln(dica);
     socket.send(dica);
     writeln("Informe a resposta");
-    scanf("%s", &resposta);
+    readln(resposta);
     socket.send(resposta);
 }
 
 
-void jogo_enviar(Jogador jogador, Socket socket){
+int jogo_enviar(Jogador jogador, Socket socket){
     char[50] respostaMestre;
-    char[50] pergunta;
-    char[50] resposta;
+    char[] pergunta;
+    char[] resposta;
     char[50] result;
     writeln("Digite sua pergunta");
-    scanf("%s", &pergunta);
+    readln(pergunta);
     socket.send(pergunta);
     auto received = socket.receive(respostaMestre); 
     writeln(respostaMestre[0 .. received]);
     writeln("Digite seu chute");
-    scanf("%s", &resposta);
+    readln(resposta);
     socket.send(resposta);
 
     received = socket.receive(result);
     writeln(result[0 .. received]);
-    return;
+    if(result[0 .. received] == "Você acertou!"){
+        return 1;
+    }
+    return 0;
 }
 
 void jogo_mestre(Jogador jogador, Socket socket){
     char[50] pergunta;
-    char[50] respostaMestre;
+    char[] respostaMestre;
     char[50] chute;
     while(true){
         auto received = socket.receive(pergunta);
+        if(pergunta[0 .. received] == "acabou"){
+            break;
+        }
         writeln(pergunta[0 .. received]);
-        scanf("%s",&respostaMestre);
+        readln(respostaMestre);
         socket.send(respostaMestre);
         received = socket.receive(chute);
         writeln(chute[0 .. received]);
     }
+    return;
 }

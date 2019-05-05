@@ -2,65 +2,72 @@ import std.socket;
 import std.stdio;
 
 class Jogador{
-    int id;
-    enum tipo_jogador{
-        mestre, player}
-    string nome;
-    int pontuacao;
+   int id;
+   string nome;
+   int pontuacao;
 
-void setId(int id){
-    this.id = id;
-}
+   void setId(int id){
+      this.id = id;
+   }
+
+   void setNome(string nome){
+      this.nome = nome;
+   }
 }
 
 class Partida{
-    Jogador[] jogadores;
-    char[] resposta;
-    char[] dica;
+   Jogador[] jogadores;
+   char[] resposta;
+   char[] dica;
 
-void setDica(char[] dica){
-    this.dica = dica;
-}
-void setResposta(char[] resposta){
-    this.resposta = resposta;
-}
-char[] getResposta(){
-    return this.resposta;
-}
-char[] getDica(){
-    return this.dica;
-}
+   void setDica(char[] dica){
+      this.dica = dica;
+   }
+   void setResposta(char[] resposta){
+      this.resposta = resposta;
+   }
+   char[] getResposta(){
+      return this.resposta;
+   }
+   char[] getDica(){
+      return this.dica;
+   }
 }
 
 void main() {
-   
+   int i = 0;
    auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
    listener.bind(new InternetAddress("localhost", 2525)); //conecta o listener a uma porta e IP
    listener.listen(10);
-   int i; 
    auto readSet = new SocketSet();
    Socket[] connectedClients; //array de clientes conectados
-   char[1024] buffer; //buffer usado para recebimentos de mensagens
+   char[50] buffer; //buffer usado para recebimentos de mensagens
    readSet.add(listener);  
    while(true){
       if(Socket.select(readSet, null, null)){
       if(readSet.isSet(listener)) {
              auto newSocket = listener.accept();
+
+             auto res = newSocket.receive(buffer);
+             Jogador jogador = new Jogador();
+             jogador.setNome(cast(string)(buffer[0 .. res]));
+
              newSocket.send("Bem-vindo ao servidor!\n");
+             res = newSocket.receive(buffer);
              connectedClients ~= newSocket;
              if(connectedClients.length == 1){
                 newSocket.send("1");
+                res = newSocket.receive(buffer);
                 readSet.add(newSocket);
              }
              else{
                 newSocket.send("0");
+                res = newSocket.receive(buffer);
                 readSet.add(newSocket);
              }
           }
          if(connectedClients.length == 3){
-            foreach(client; connectedClients){
-               client.send("start");
-            }
+               sendStart(connectedClients);
             break;
          }
    /*
@@ -80,9 +87,10 @@ void main() {
      */  
    }
    }
+
    Partida partida = new Partida();
-   char[1024] resposta;
-   char[1024] dica;
+   char[50] resposta;
+   char[50] dica;
    writeln("Recebendo info");
    auto got = connectedClients[0].receive(dica);
    partida.dica = (dica[0 .. got]);
@@ -91,69 +99,50 @@ void main() {
    
    writeln(partida.dica);
    writeln(partida.resposta);
+   writeln("printou");
    
-   foreach(client; connectedClients){
-      if(client != connectedClients[0]){
-      client.send("init");
-      }
-   }
 
    while(true){
-      foreach(client; connectedClients) {
-         if(client != connectedClients[0]){
+         if(i >= 3){
+            i = 1;
+         }
+         if(i == 0){
+            i = 1;
+         }
+         else {
             char[50] pergunta;
             char[50] respostaMestre;
             char[50] chute;
-            got = client.receive(pergunta);
+
+            connectedClients[i].send("suavez");
+
+            got = connectedClients[i].receive(pergunta);
             connectedClients[0].send(pergunta[0 .. got]);
             got = connectedClients[0].receive(respostaMestre);
-            client.send(respostaMestre[0 .. got]);
-
-            got = client.receive(chute);
+            connectedClients[i].send(respostaMestre[0 .. got]);
+            got = connectedClients[i].receive(chute);
             connectedClients[0].send(chute[0 .. got]);
 
             if(chute[0 .. got] == partida.resposta){
-               client.send("Você acertou!");
+               connectedClients[i].send("Você acertou!");
                break;
             }else{
-               client.send("Você errou :( \n Aguarde sua vez.");
+               connectedClients[i].send("Você errou :( \n Aguarde sua vez.");
+               i +=1;
             }
-         }
-      }
-      
+         }   
    }
-
+   foreach(client; connectedClients){
+      client.send("acabou");
+   }
 }
-/*
-   while(true) {
-       i = 0;
-       readSet.reset(); //tira todos os sockets da variavel
-       readSet.add(listener); //adiciona o socket que aceita conexões na lista de Sockets
-        //Adiciona todos os sockets conectados na lista do readSet
-       if(Socket.select(readSet, null, null)) {
-          foreach(client; connectedClients){
-            if(readSet.isSet(client))  {
-                auto got = client.receive(buffer);
-                if(buffer[0 .. got] == "exit"){
-                   connectedClients = remove(connectedClients, i);
-                   break;
-                }
-                else{
-                foreach(sender; connectedClients){
-                   writeln("Enviou");
-                   sender.send(buffer[0 .. got]);
-                }
-                writeln(buffer[0 .. got]);
-                }
-                }
-               i += 1; 
-            }
-       }      
-          
-       }
-   }
-*/
 
+void sendStart(Socket[] clients){
+   foreach(client; clients){
+               client.send("start");
+            }
+   return;
+}
 Socket[] remove(Socket[] connectedClients, int indice){
    int i;
    Socket[] novalista;
