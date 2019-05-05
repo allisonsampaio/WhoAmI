@@ -83,19 +83,46 @@ void main() {
    Partida partida = new Partida();
    char[1024] resposta;
    char[1024] dica;
-         writeln("Recebendo info");
-         auto got = connectedClients[0].receive(dica);
-         partida.dica = (dica[0 .. got]);
-         got = connectedClients[0].receive(resposta);
-         partida.resposta = (resposta[0 .. got]);
-         
-         writeln(partida.dica);
-         writeln(partida.resposta);
-         
-         foreach(client; connectedClients){
-            client.send("init");
-            client.send(partida.getDica());
+   writeln("Recebendo info");
+   auto got = connectedClients[0].receive(dica);
+   partida.dica = (dica[0 .. got]);
+   got = connectedClients[0].receive(resposta);
+   partida.resposta = (resposta[0 .. got]);
+   
+   writeln(partida.dica);
+   writeln(partida.resposta);
+   
+   foreach(client; connectedClients){
+      if(client != connectedClients[0]){
+      client.send("init");
+      }
+   }
+
+   while(true){
+      foreach(client; connectedClients) {
+         if(client != connectedClients[0]){
+            char[50] pergunta;
+            char[50] respostaMestre;
+            char[50] chute;
+            got = client.receive(pergunta);
+            connectedClients[0].send(pergunta[0 .. got]);
+            got = connectedClients[0].receive(respostaMestre);
+            client.send(respostaMestre[0 .. got]);
+
+            got = client.receive(chute);
+            connectedClients[0].send(chute[0 .. got]);
+
+            if(chute[0 .. got] == partida.resposta){
+               client.send("Você acertou!");
+               break;
+            }else{
+               client.send("Você errou :( \n Aguarde sua vez.");
+            }
          }
+      }
+      
+   }
+
 }
 /*
    while(true) {

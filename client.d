@@ -29,10 +29,12 @@ void main() {
     if(jogador.id == 1){
         wait_jogador(socket);
         mestre(jogador, socket);
+        jogo_mestre(jogador, socket);
     }
     else{
         wait_jogador(socket);
         wait(socket);
+        jogo_enviar(jogador, socket);
     }
     /*while(true){
     writeln("Server said: ", buffer[0 .. socket.receive(buffer)]);
@@ -44,7 +46,6 @@ void main() {
        }
     }    
     }*/
-    writeln("asdyagwofuiwehaúfgyeuigtWU");
     return;
 }
 
@@ -52,14 +53,12 @@ void main() {
 void wait(Socket socket){
     writeln("Mestre digitando");
     char[1024] buffer;
-    while(true){
         auto received = socket.receive(buffer);
         if(buffer[0 .. received] == "init"){
-            received = socket.receive(buffer);
-            writeln(buffer[0 .. received]);
+            writeln("Recebeu a buceta do init");
             return;
         }
-    }
+    
 }
 
 void wait_jogador(Socket socket){
@@ -96,27 +95,36 @@ void mestre(Jogador jogador, Socket socket){
     socket.send(resposta);
 }
 
-int receber(Jogador jogador, Socket socket){
-    while(true){
-        if(1){
-            break;
-        }
-        
-    }
-    return 1;
-}
 
-void enviar(Jogador jogador, Socket socket){
-    char[1024] buffer;
-    char[500] pergunta;
-    char[500] resposta;
+void jogo_enviar(Jogador jogador, Socket socket){
+    char[50] respostaMestre;
+    char[50] pergunta;
+    char[50] resposta;
+    char[50] result;
     writeln("Digite sua pergunta");
     scanf("%s", &pergunta);
     socket.send(pergunta);
-    auto received = socket.receive(buffer); 
-    writeln(buffer[0 .. received]);
+    auto received = socket.receive(respostaMestre); 
+    writeln(respostaMestre[0 .. received]);
     writeln("Digite seu chute");
     scanf("%s", &resposta);
     socket.send(resposta);
+
+    received = socket.receive(result);
+    writeln(result[0 .. received]);
     return;
+}
+
+void jogo_mestre(Jogador jogador, Socket socket){
+    char[50] pergunta;
+    char[50] respostaMestre;
+    char[50] chute;
+    while(true){
+        auto received = socket.receive(pergunta);
+        writeln(pergunta[0 .. received]);
+        scanf("%s",&respostaMestre);
+        socket.send(respostaMestre);
+        received = socket.receive(chute);
+        writeln(chute[0 .. received]);
+    }
 }
