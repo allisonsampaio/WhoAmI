@@ -95,9 +95,16 @@ void main() {
    }
    
    char[50] resposta;
-   char[50] dica;
+   char[] dica;
    auto got = connectedClients[0].receive(dica);
    partida.dica = (dica[0 .. got]);
+
+   foreach(client; connectedClients){
+         if(client != connectedClients[0]){
+               client.send(dica);
+         }
+   }
+
    got = connectedClients[0].receive(resposta);
    partida.resposta = (resposta[0 .. got]);
    

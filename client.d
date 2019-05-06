@@ -48,9 +48,14 @@ void main() {
         int isDone = 0;
         wait_jogador(socket);
         writeln("Mestre digitando . .");
+
+        char[] buf;
+        auto got = socket.receive(buf);
+        //write("Dica da partida: ");
+        writeln(buf[0 .. got]);
+
         while(true){
             auto rec = socket.receive(buffer);
-            writeln(buffer[0 .. rec]);
             if(buffer[0 .. rec] == "suavez"){
                 isDone = jogo_enviar(jogador, socket);
                 if(isDone == 1){
