@@ -96,7 +96,6 @@ void main() {
    
    char[50] resposta;
    char[50] dica;
-   writeln("Recebendo info");
    auto got = connectedClients[0].receive(dica);
    partida.dica = (dica[0 .. got]);
    got = connectedClients[0].receive(resposta);
