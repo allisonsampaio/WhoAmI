@@ -21,7 +21,8 @@ class Jogador{
 void main() {
     Jogador jogador = new Jogador();
     char[] nomeJogador;
-    writeln("Digite seu user");
+    writeln("Para entrar no jogo digite seu user:");
+    write("> ");
     readln(nomeJogador);
     jogador.setNome(cast(string)nomeJogador);
 
@@ -46,20 +47,20 @@ void main() {
     else{
         int isDone = 0;
         wait_jogador(socket);
-        writeln("Mestre digitando");
+        writeln("Mestre digitando . .");
         while(true){
             auto rec = socket.receive(buffer);
             writeln(buffer[0 .. rec]);
             if(buffer[0 .. rec] == "suavez"){
                 isDone = jogo_enviar(jogador, socket);
                 if(isDone == 1){
-                writeln("Voce ganhou");
+                writeln("Voce ganhou!");
                 break;
             }
             }
             
             if(buffer[0 .. rec] == "acabou"){
-                writeln("O jogo acabou !!");
+                writeln("O jogo acabou!");
                 break;
             }
         }
@@ -69,7 +70,7 @@ void main() {
 }
 
 void wait_jogador(Socket socket){
-    writeln("Esperando partida começar");
+    writeln("Esperando partida começar . .");
     char[50] buffer;
     while(true){
         auto received = socket.receive(buffer);
@@ -83,13 +84,14 @@ void mestre(Jogador jogador, Socket socket){
     char[] dica;
     char[] resposta;
     writeln("Informe a dica");
+    write("> ");
     readln(dica);
     socket.send(dica);
     writeln("Informe a resposta");
+    write("> ");
     readln(resposta);
     socket.send(resposta);
 }
-
 
 int jogo_enviar(Jogador jogador, Socket socket){
     char[50] respostaMestre;
@@ -97,11 +99,13 @@ int jogo_enviar(Jogador jogador, Socket socket){
     char[] resposta;
     char[50] result;
     writeln("Digite sua pergunta");
+    write("> ");
     readln(pergunta);
     socket.send(pergunta);
     auto received = socket.receive(respostaMestre); 
     writeln(respostaMestre[0 .. received]);
     writeln("Digite seu chute");
+    write("> ");
     readln(resposta);
     socket.send(resposta);
 

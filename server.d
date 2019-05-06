@@ -43,6 +43,8 @@ class Partida{
 }
 
 void main() {
+
+      writeln("Servidor iniciado . . ");
    int i = 0;
    string name;
    Partida partida = new Partida();
@@ -61,7 +63,7 @@ void main() {
              auto newSocket = listener.accept();
              auto res = newSocket.receive(nome);
              file.write(cast(string)(nome[0 .. res]));
-             newSocket.send("Bem-vindo ao servidor!\n");
+             newSocket.send("\n*** Bem-vindo ao WhoAmI! ***\n");
              res = newSocket.receive(buffer);
              connectedClients ~= newSocket;
              if(connectedClients.length == 1){
