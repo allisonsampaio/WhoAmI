@@ -48,11 +48,7 @@ void main() {
         int isDone = 0;
         wait_jogador(socket);
         writeln("Mestre digitando . .");
-
-        char[] buf;
-        auto got = socket.receive(buf);
-        //write("Dica da partida: ");
-        writeln(buf[0 .. got]);
+        wait_mestre(socket);
 
         while(true){
             auto rec = socket.receive(buffer);
@@ -127,6 +123,7 @@ void jogo_mestre(Jogador jogador, Socket socket){
     char[] respostaMestre;
     char[50] chute;
     while(true){
+        write("Aguardando pergunta do jogador");
         auto received = socket.receive(pergunta);
         if(pergunta[0 .. received] == "acabou"){
             break;
@@ -138,4 +135,24 @@ void jogo_mestre(Jogador jogador, Socket socket){
         writeln(chute[0 .. received]);
     }
     return;
+}
+
+void wait_mestre(Socket socket){
+    char[50] dicadomestre;
+    auto receive = socket.receive(dicadomestre);
+    int i = retira(dicadomestre[0 .. receive]);
+    write("Dica da partida: ");
+    write(dicadomestre[0 .. i]);
+}
+
+int retira(char[] recebido){
+   int i=0;
+   char aux;
+    while(aux != '\n'){
+
+        aux = recebido[i];
+        i += 1;
+        
+    }
+return i;
 }

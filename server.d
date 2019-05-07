@@ -95,22 +95,20 @@ void main() {
    }
    
    char[50] resposta;
-   char[] dica;
+   char[20] dica;
    auto got = connectedClients[0].receive(dica);
    partida.dica = (dica[0 .. got]);
-
-   foreach(client; connectedClients){
+   got = connectedClients[0].receive(resposta);
+   partida.resposta = (resposta[0 .. got]);
+   writeln("Dica da partida: ");
+   writeln(partida.dica);
+   writeln("Resposta da partida");
+   writeln(partida.resposta);
+    foreach(client; connectedClients){
          if(client != connectedClients[0]){
                client.send(dica);
          }
    }
-
-   got = connectedClients[0].receive(resposta);
-   partida.resposta = (resposta[0 .. got]);
-   
-   writeln(partida.dica);
-   writeln(partida.resposta);
-   writeln("printou");
    
 
    while(true){
@@ -147,11 +145,7 @@ void main() {
       client.send("acabou");
    }
 }
-string criaNome(string nome){
-   string name;
-   name = nome;
-   return name;
-}
+
 void sendStart(Socket[] clients){
    foreach(client; clients){
                client.send("start");
