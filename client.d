@@ -123,7 +123,7 @@ void jogo_mestre(Jogador jogador, Socket socket){
     char[] respostaMestre;
     char[50] chute;
     while(true){
-        write("Aguardando pergunta do jogador");
+        writeln("Aguardando pergunta do jogador: ");
         auto received = socket.receive(pergunta);
         if(pergunta[0 .. received] == "acabou"){
             break;
