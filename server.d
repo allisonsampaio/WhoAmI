@@ -2,6 +2,7 @@ import std.socket;
 import std.stdio;
 import std.file;
 import std.string;
+import std.conv;
 
 class Jogador{
    public:
@@ -49,7 +50,7 @@ class Partida{
    }
 }
 
-void main() {
+void main(string[] args) {
 
    writeln("Servidor iniciado . . ");
    File file_ganhador = File("ganhador.txt", "w");
@@ -57,8 +58,12 @@ void main() {
    int i = 0;
    string name;
    Partida partida = new Partida();
+   
+   ushort porta = parse!ushort(args[1]);
+   writeln(porta);
+
    auto listener = new Socket(AddressFamily.INET, SocketType.STREAM);
-   listener.bind(new InternetAddress("localhost", 2525)); //conecta o listener a uma porta e IP
+   listener.bind(new InternetAddress("localhost", porta)); //conecta o listener a uma porta e IP
    listener.listen(10);
    auto readSet = new SocketSet();
    Socket[] connectedClients; //array de clientes conectados

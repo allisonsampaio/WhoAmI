@@ -2,6 +2,7 @@ import std.stdio;
 import std.socket;
 import std.file;
 import std.string;
+import std.conv;
 
 class Jogador{
     int id;
@@ -20,7 +21,7 @@ class Jogador{
     }
 }
 
-void main() {
+void main(string[] args) {
     Jogador jogador = new Jogador();
     char[] nomeJogador;
     writeln("Para entrar no jogo digite seu user:");
@@ -28,8 +29,11 @@ void main() {
     readln(nomeJogador);
     jogador.setNome(cast(string)nomeJogador);
 
+    ushort porta = parse!ushort(args[1]);
+    writeln(porta);
+
     auto socket = new Socket(AddressFamily.INET,  SocketType.STREAM);
-    socket.connect(new InternetAddress("localhost", 2525));
+    socket.connect(new InternetAddress("localhost", porta));
 
     socket.send(jogador.getNome());
 
