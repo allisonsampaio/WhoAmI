@@ -23,6 +23,7 @@ class Partida{
    string[] nomes; 
    char[] resposta;
    char[] dica;
+   string ganhador;
 
    void setDica(char[] dica){
       this.dica = dica;
@@ -40,11 +41,19 @@ class Partida{
    void setNome(string nome){
       this.nomes ~= nome;
    }
+   void setGanhador(string ganhador){
+      this.ganhador = ganhador;
+   }
+   string getGanhador(){
+      return this.ganhador;
+   }
 }
 
 void main() {
 
-      writeln("Servidor iniciado . . ");
+   writeln("Servidor iniciado . . ");
+   File file_ganhador = File("ganhador.txt", "w");
+   file_ganhador.write("");
    int i = 0;
    string name;
    Partida partida = new Partida();
@@ -65,7 +74,7 @@ void main() {
              file.write(cast(string)(nome[0 .. res]));
              newSocket.send("\n*** Bem-vindo ao WhoAmI! ***\n");
              res = newSocket.receive(buffer);
-             connectedClients ~= newSocket;
+             connectedClients ~= newSocket;write("Dica da partida: ");
              if(connectedClients.length == 1){
                 newSocket.send("1");
                 res = newSocket.receive(buffer);
@@ -82,13 +91,12 @@ void main() {
                while(!file.eof()){
                   string line = chomp(file.readln());
                   if(line != ""){
-                     partida.nomes ~= line;
+                     partida.setNome(line);
                   }
                }
-               file = File("nomes.txt", "w");
-               file.write("");
-               file.close();
+               
                sendStart(connectedClients);
+               //sendNames(connectedClients,partida);
             break;
          }
    }
@@ -134,16 +142,26 @@ void main() {
 
             if(chute[0 .. got] == partida.resposta){
                connectedClients[i].send("Você acertou!");
+               partida.setGanhador(partida.nomes[i]);
                break;
             }else{
                connectedClients[i].send("Você errou :( \n Aguarde sua vez.");
                i +=1;
             }
          }   
+   
    }
+   file_ganhador = File("ganhador.txt", "a");
+   file_ganhador.write(partida.getGanhador());
    foreach(client; connectedClients){
       client.send("acabou");
    }
+   
+   
+   file = File("nomes.txt", "w");
+               file.write("");
+               file.close();
+               file_ganhador.close();
 }
 
 void sendStart(Socket[] clients){
@@ -151,7 +169,21 @@ void sendStart(Socket[] clients){
                client.send("start");
             }
    return;
-}/*
+}
+/*
+void sendNames(Socket[] connectedClients, Partida partida){
+   char[] buffer;
+   foreach(client; connectedClients){
+      if(client != connectedClients[0]){
+      foreach(nome; partida.nomes){
+         client.send(nome);
+         client.receive(buffer);
+      }
+      client.send("start");
+      }
+   }
+
+}
 Socket[] remove(Socket[] connectedClients, int indice){
    int i;
    Socket[] novalista;

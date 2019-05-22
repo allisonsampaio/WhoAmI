@@ -1,5 +1,7 @@
 import std.stdio;
 import std.socket;
+import std.file;
+import std.string;
 
 class Jogador{
     int id;
@@ -41,14 +43,18 @@ void main() {
     jogador.setId(id_jogador);
     if(jogador.id == 1){
         wait_jogador(socket);
+        jogadores();
         mestre(jogador, socket);
         jogo_mestre(jogador, socket);
+        writeln("O jogo acabou!");  
     }
     else{
         int isDone = 0;
         wait_jogador(socket);
+        jogadores();
         writeln("Mestre digitando . .");
         wait_mestre(socket);
+        
 
         while(true){
             auto rec = socket.receive(buffer);
@@ -61,7 +67,7 @@ void main() {
             }
             
             if(buffer[0 .. rec] == "acabou"){
-                writeln("O jogo acabou!");
+                writeln("O jogo acabou!");        
                 break;
             }
         }
@@ -112,7 +118,7 @@ int jogo_enviar(Jogador jogador, Socket socket){
 
     received = socket.receive(result);
     writeln(result[0 .. received]);
-    if(result[0 .. received] == "Você acertou!"){
+    if(result[0 .. received] == "Você acertou!acabou"){
         return 1;
     }
     return 0;
@@ -129,8 +135,10 @@ void jogo_mestre(Jogador jogador, Socket socket){
             break;
         }
         writeln(pergunta[0 .. received]);
+        writeln("Digite sua resposta: ");
         readln(respostaMestre);
         socket.send(respostaMestre);
+        writeln("Aguardando chute do jogador: ");
         received = socket.receive(chute);
         writeln(chute[0 .. received]);
     }
@@ -156,3 +164,23 @@ int retira(char[] recebido){
     }
 return i;
 }
+
+void jogadores(){
+    File file = File("nomes.txt", "r");
+    writeln("Jogadores na partida: ");
+    while(!file.eof()){
+                  string line = chomp(file.readln());
+                  if(line != ""){
+                     writeln(line);
+                  }
+               }
+
+return;
+}
+/*
+void printGanhador(Socket socket){
+    char[] ganhador;
+    File file = File("ganhador.txt", "r");
+    write("Ganhador salvo em arquivo");
+return;
+}*/
